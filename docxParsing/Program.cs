@@ -12,25 +12,34 @@ namespace docxParsing
     {
         private static Dictionary<string, string> valeurs = new Dictionary<string, string>()
             {
-                {"RAISON_SOCIALE", "Finacoop"},
-                {"ADRESSE", "35 rue des Palmiers"},
-                {"CODE_POSTAL", "75002"}
+                {"RaisonSociale", "CECI EST UNE RAISON SOCIALE"},
+                {"Adresse", "35 rue des Palmiers"},
+                {"CP", "75002"},
+                {"FormeJuridique", "SARL" },
+                {"Ville", "Paris" },
+                {"DateCourante", "28/03/2018" },
+                {"Prenom", "Alex" },
+                {"Nom", "Seymour" },
         };
         static void Main(string[] args)
         {
             
-            DocX document = DocX.Load("document.docx");
-            List<string> jetons = document.FindUniqueByPattern("{{(.*?)}}", RegexOptions.IgnoreCase);
-            for(int j = 0; j < jetons.Count; j++)
-            {
-                Console.WriteLine("Le jeton " + jetons[j] + " a été trouvé");
-            }
+            DocX document = DocX.Load(@"C:\Users\seymour\Source\Repos\docxParsing\annotations.docx");
+            Paragraph pa;
+            
+            string code_postal = "CodePostal";
 
-            for (int i = 0; i < valeurs.Count; i++)
+            // document.ReplaceText("{{"+code_postal+"}}", ChercheValeur(code_postal), false);
+            replaceAll(document, valeurs);
+            document.SaveAs(@"C:\Users\seymour\Source\Repos\docxParsing\documentGénéré.docx");
+        }
+
+        private static void replaceAll(DocX document, Dictionary<string, string> dict)
+        {
+            foreach (var item in dict)
             {
-                document.ReplaceText("{{(.*?)}}", ChercheValeur, false, RegexOptions.IgnoreCase, null, new Formatting());
+                document.ReplaceText("{{" + item.Key + "}}", item.Value);
             }
-            document.SaveAs("documentGénéré.docx");
         }
 
         private static string ChercheValeur(string chaine)
